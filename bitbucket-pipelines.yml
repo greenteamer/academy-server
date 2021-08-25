@@ -17,17 +17,17 @@ pipelines:
               - flake8 . --extend-exclude=dist,build --show-source --statistics
   branches:
     development:
-        - step:
-            deployment: test
-            name: Deploy to test server
-            script:
-              - apt-get update -y
-              - apt-get install -y ssh
-              - echo "*** Pull changes to dev server ***"
-              - ssh root@212.193.49.101 'cd /var/www/django/academy/app && git checkout development && git pull'
-              - echo "*** Run deploy script ***"
-              - ssh root@212.193.49.101 'cd /var/www/django/academy/app && sh deploy.sh'
-              - echo "Deploy step finished"
+      - step:
+          deployment: test
+          name: Deploy to test server
+          script:
+            - apt-get update -y
+            - apt-get install -y ssh
+            - echo "*** Pull changes to dev server ***"
+            - ssh root@212.193.49.101 'cd /var/www/django/academy/app && git checkout development && git pull'
+            - echo "*** Run deploy script ***"
+            - ssh root@212.193.49.101 'cd /var/www/django/academy/app && sh deploy.sh'
+            - echo "Deploy step finished"
     master:
       - step:
           name: Deploy to production server
