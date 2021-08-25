@@ -1,43 +1,29 @@
-#  Template python-build
-
-#  This template allows you to validate your python code.
-#  The workflow allows running tests and code linting on the default branch.
-
 image: python:3.8
 
 pipelines:
-  default:
-    # - parallel:
-    #     - step:
-    #         name: Test
-    #         caches:
-    #           - pip
-    #         script:
-    #           - if [ -f deps.pip ]; then pip install -r deps.pip; fi
-    #           - pytest
-    #     - step:
-    #         name: Lint code
-    #         script:
-    #           # Enforce style consistency across Python projects https://flake8.pycqa.org/en/latest/manpage.html
-    #           - pip install flake8
-    #           - flake8 . --extend-exclude=dist,build --show-source --statistics
-    - step:
-        name: Deploy to test server
-        deployment: test
-        # trigger: manual  # Uncomment to make this a manual deployment.
-        # script:
-        #   - echo "Deploying to production environment"
-        #   - pipe: atlassian/ssh-run:0.3.1
-        #     variables:
-        #       SSH_USER: "root"
-        #       SERVER: 212.193.49.101
-        #       SSH_KEY: "/root/.ssh/id_rsa"
-        #       # COMMAND: ".script.sh"
-        #       COMMAND: 'echo $HOSTNAME'
-        script:
-          - apt-get update -y
-          - apt-get install -y ssh
-          - ssh root@212.193.49.101 'cd /var/www/django/academy/app && git pull'
-          - ssh root@212.193.49.101 'cd /var/www/django/academy/app && sh deploy.sh'
-          # - ssh root@212.193.49.101 'sh /root/script.sh'
-          - echo "Deploy step finished"
+  branches:
+    master:
+      - parallel:
+          - step:
+              name: Test
+              caches:
+                - pip
+              script:
+                - if [ -f deps.pip ]; then pip install -r deps.pip; fi
+                - pytest
+          - step:
+              name: Lint code
+              script:
+                # Enforce style consistency across Python projects https://flake8.pycqa.org/en/latest/manpage.html
+                - pip install flake8
+                - flake8 . --extend-exclude=dist,build --show-source --statistics
+      - step:
+          name: Deploy to test server
+          deployment: test
+          script:
+            - apt-get update -y
+            - apt-get install -y ssh
+            - ssh root@212.193.49.101 'cd /var/www/django/academy/app && git pull'
+            - ssh root@212.193.49.101 'cd /var/www/django/academy/app && sh deploy.sh'
+            # - ssh root@212.193.49.101 'sh /root/script.sh'
+            - echo "Deploy step finished"
