@@ -6,3 +6,4 @@ ENV_DIR=$(dirname $APP_DIR)
 $ENV_DIR/.env/bin/python3 -m pip install -r deps.pip
 $ENV_DIR/.env/bin/python3 $APP_DIR/manage.py migrate
 echo yes | $ENV_DIR/.env/bin/python3 $APP_DIR/manage.py collectstatic
+# systemctl restart gunicorn

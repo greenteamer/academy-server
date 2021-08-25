@@ -6,6 +6,7 @@ class Expert(models.Model):
     last_name = models.CharField(max_length=100)
     bio = models.TextField()
     personal_life = models.TextField()
+    statistic = models.TextField()
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
