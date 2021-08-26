@@ -1,29 +1,49 @@
 image: python:3.8
 
 pipelines:
+  default:
+    - parallel:
+        - step:
+            name: Run test
+            caches:
+              - pip
+            script:
+              - if [ -f deps.pip ]; then pip install -r deps.pip; fi
+              - pytest
+        - step:
+            name: Run linter
+            script:
+              - pip install flake8
+              - flake8 . --extend-exclude=dist,build --show-source --statistics
   branches:
-    master:
+    development:
       - parallel:
           - step:
-              name: Test
+              name: Run test
               caches:
                 - pip
               script:
                 - if [ -f deps.pip ]; then pip install -r deps.pip; fi
                 - pytest
           - step:
-              name: Lint code
+              name: Run linter
               script:
-                # Enforce style consistency across Python projects https://flake8.pycqa.org/en/latest/manpage.html
                 - pip install flake8
                 - flake8 . --extend-exclude=dist,build --show-source --statistics
       - step:
-          name: Deploy to test server
           deployment: test
+          name: Deploy to test server
           script:
             - apt-get update -y
             - apt-get install -y ssh
-            - ssh root@212.193.49.101 'cd /var/www/django/academy/app && git pull'
+            - echo "*** Pull changes to dev server ***"
+            - ssh root@212.193.49.101 'cd /var/www/django/academy/app && git checkout development && git pull'
+            - echo "*** Run deploy script ***"
             - ssh root@212.193.49.101 'cd /var/www/django/academy/app && sh deploy.sh'
-            # - ssh root@212.193.49.101 'sh /root/script.sh'
             - echo "Deploy step finished"
+    master:
+      - step:
+          name: Deploy to production server
+          deployment: production
+          script:
+            - echo "Production deploy does not set up"
