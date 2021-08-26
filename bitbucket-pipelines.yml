@@ -1,21 +1,21 @@
 image: python:3.8
 
 pipelines:
-  default:
-    - parallel:
-        - step:
-            name: Run test
-            caches:
-              - pip
-            script:
-              - if [ -f deps.pip ]; then pip install -r deps.pip; fi
-              - pytest
-        - step:
-            name: Run linter
-            script:
-              - pip install flake8
-              - flake8 . --extend-exclude=dist,build --show-source --statistics
   branches:
+    '{development,feature/*}':
+      - parallel:
+          - step:
+              name: Run test
+              caches:
+                - pip
+              script:
+                - if [ -f deps.pip ]; then pip install -r deps.pip; fi
+                - pytest
+          - step:
+              name: Run linter
+              script:
+                - pip install flake8
+                - flake8 . --extend-exclude=dist,build --show-source --statistics
     development:
       - step:
           deployment: test
